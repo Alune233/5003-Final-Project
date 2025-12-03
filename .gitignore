@@ -71,3 +71,4 @@ htmlcov/
 *.tmp
 .env
 
+zl_outline.md

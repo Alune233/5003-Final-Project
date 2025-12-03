@@ -27,6 +27,10 @@ class LightGBMTrainer:
             random_state: 随机种子
         """
         self.params = params or self._get_default_params()
+        self.params.setdefault('device_type', 'gpu')
+        self.params.setdefault('tree_learner', 'voting')
+        self.params.setdefault('gpu_platform_id', 0)
+        self.params.setdefault('gpu_device_id', 0)
         self.n_folds = n_folds
         self.random_state = random_state
         self.models = []  # 存储每个fold的模型

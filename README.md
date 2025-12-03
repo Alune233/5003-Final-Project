@@ -66,10 +66,12 @@ class YourAlgorithm(BaseHPO):
 #### 2. 注册算法到 `src/hpo/__init__.py`
 
 ```python
+from .grid_search import GridSearch
 from .your_algo import YourAlgorithm
 
 AVAILABLE_ALGORITHMS = {
     'random': RandomSearch,
+    'grid': GridSearch,
     'your_algo': YourAlgorithm,  # 加这一行
 }
 ```
@@ -98,6 +100,9 @@ python main.py --mode hpo --algo your_algo
 ```bash
 # 默认运行（HPO with random算法）
 python main.py
+
+# Grid Search
+python main.py --algo grid
 
 # 提取特征
 python main.py --mode extract

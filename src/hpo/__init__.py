@@ -1,8 +1,10 @@
 from .base_hpo import BaseHPO
 from .random_search import RandomSearch
+from .grid_search import GridSearch
 
 AVAILABLE_ALGORITHMS = {
     'random': RandomSearch,
+    'grid': GridSearch,
     # 'bayesian': BayesianOptimization,  # 队友添加示例
     # 'tpe': TPEOptimizer,              # 队友添加示例
     # 'optuna': OptunaOptimizer,        # 队友添加示例
