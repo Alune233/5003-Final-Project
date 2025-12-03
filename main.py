@@ -64,9 +64,14 @@ def run_hpo(args):
     
     # 自动获取HPO算法类（根据命令行参数）
     HPOClass = get_hpo_algorithm(args.hpo_algorithm)
-    
+
     # 初始化HPO算法（参数由各HPO算法自己设置）
-    optimizer = HPOClass()
+    optimizer_kwargs = {}
+    if getattr(args, 'use_history', False):
+        optimizer_kwargs['use_history'] = True
+    if getattr(args, 'history_path', None):
+        optimizer_kwargs['initial_history_path'] = args.history_path
+    optimizer = HPOClass(**optimizer_kwargs)
     
     # 创建目标函数（使用HPO算法自己设置的cv_folds）
     objective_fn = objective_function_factory(
@@ -87,6 +92,13 @@ def run_hpo(args):
     history_path = os.path.join(args.model_dir, f'{args.hpo_algorithm}_history.json')
     optimizer.save_history(history_path)
     logger.info(f"优化历史已保存: {history_path}")
+
+    # 额外再保存一份到 outputs 目录，便于后续上传/查看
+    outputs_dir = os.path.dirname(args.output_path) or 'outputs'
+    os.makedirs(outputs_dir, exist_ok=True)
+    outputs_history_path = os.path.join(outputs_dir, f'{args.hpo_algorithm}_history.json')
+    optimizer.save_history(outputs_history_path)
+    logger.info(f"优化历史也已保存到: {outputs_history_path}")
     
     # 绘制优化历史（如果支持）
     try:
@@ -126,11 +138,23 @@ def run_hpo(args):
         'target_6': test_predictions[:, 6]
     })
     
-    os.makedirs(os.path.dirname(args.output_path), exist_ok=True)
+    # 确保输出目录存在
+    output_dir = os.path.dirname(args.output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    
+    # 保存提交文件
     submission.to_csv(args.output_path, index=False)
     
     logger.info(f"\n提交文件已保存: {args.output_path}")
     logger.info(f"最终CV得分: {final_cv_score:.6f}")
+    
+    # 额外保存一份带时间戳的副本，防止覆盖
+    import time
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    backup_path = os.path.join(output_dir, f"submission_{args.hpo_algorithm}_{timestamp}.csv")
+    submission.to_csv(backup_path, index=False)
+    logger.info(f"提交文件副本已保存: {backup_path}")
     
     return best_params, best_score
 
@@ -155,6 +179,8 @@ def main():
     
     parser.add_argument('--algo', type=str, default='random',
                        help=f'HPO算法名称，可用: {list_algorithms()}')
+    parser.add_argument('--use_history', action='store_true', help='是否使用历史记录来缩小搜索空间（适用于SMAC3）')
+    parser.add_argument('--history_path', type=str, default=None, help='历史文件路径（用于warm start）')
     
     args = parser.parse_args()
     

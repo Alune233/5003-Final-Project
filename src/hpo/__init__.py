@@ -1,8 +1,10 @@
 from .base_hpo import BaseHPO
 from .random_search import RandomSearch
+from .smac3_hpo import SMAC3HPO
 
 AVAILABLE_ALGORITHMS = {
     'random': RandomSearch,
+    'smac3': SMAC3HPO,  # Add SMAC3 algorithm
     # 'bayesian': BayesianOptimization,  # 队友添加示例
     # 'tpe': TPEOptimizer,              # 队友添加示例
     # 'optuna': OptunaOptimizer,        # 队友添加示例
