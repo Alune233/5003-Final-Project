@@ -49,7 +49,7 @@ class LightGBMTrainer:
             'verbosity': -1
         }
     
-    def train_with_cv(self, X, y, early_stopping_rounds=50, verbose=100):
+    def train_with_cv(self, X, y, early_stopping_rounds=50, verbose=100, suppress_lgb_warnings=True, force_col_wise=False):
         """
         使用交叉验证训练模型
         
@@ -62,6 +62,18 @@ class LightGBMTrainer:
         Returns:
             float: 交叉验证平均得分(logloss)
         """
+        # 确保参数中包含 num_class
+        if 'num_class' not in self.params:
+            self.params['num_class'] = 7
+        if 'objective' not in self.params:
+            self.params['objective'] = 'multiclass'
+        if 'metric' not in self.params:
+            self.params['metric'] = 'multi_logloss'
+
+        # 如果用户想强制 col-wise，设置到参数里以避免开销检测 Info 输出
+        if force_col_wise:
+            self.params['force_col_wise'] = True
+
         logger.info("="*60)
         logger.info("开始交叉验证训练")
         logger.info(f"训练样本数: {len(X)}, 特征维度: {X.shape[1]}")
@@ -73,7 +85,23 @@ class LightGBMTrainer:
         oof_predictions = np.zeros((len(X), 7))  # Out-of-fold预测
         self.models = []
         
+        # 添加记录最佳超参数的逻辑
+        best_params = None
+        best_score = float('inf')
+        best_fold = None
+        
         # 交叉验证
+        # WARNING: 某些 LightGBM 内部警告会持续打印（例如：'No further splits with positive gain'），
+        # 这类警告通常是因为训练集中某些节点没有可用的分裂（如样本太少或标签单一）。
+        # 如果不希望看到这些警告，可以通过 suppress_lgb_warnings=True 抑制（使用 warnings.filterwarnings）。
+        import warnings
+        filter_context = None
+        if suppress_lgb_warnings:
+            # 只忽略特定消息，使用 catch_warnings 以避免全局修改
+            filter_context = warnings.catch_warnings()
+            filter_context.__enter__()
+            warnings.filterwarnings('ignore', message='No further splits with positive gain')
+            warnings.filterwarnings('ignore', message='Auto-choosing col-wise multi-threading')
         for fold_idx, (train_idx, val_idx) in enumerate(skf.split(X, y)):
             logger.info(f"\n{'='*60}")
             logger.info(f"Fold {fold_idx + 1}/{self.n_folds}")
@@ -83,35 +111,101 @@ class LightGBMTrainer:
             X_train, X_val = X[train_idx], X[val_idx]
             y_train, y_val = y[train_idx], y[val_idx]
             
+            # 诊断: 检查每个折是否包含至少两个类别（多分类训练需要）
+            unique_train_classes = np.unique(y_train)
+            if len(unique_train_classes) < 2:
+                logger.warning(f"Fold {fold_idx+1} 跳过训练: 训练集只包含单一类别: {unique_train_classes}")
+                # 为保持 oof_predictions 的结构，我们为验证集返回占位预测（one-hot majority）
+                maj_class = int(unique_train_classes[0])
+                val_pred = np.zeros((len(X_val), self.params.get('num_class', 7)))
+                val_pred[:, maj_class] = 1.0
+                cv_scores.append(log_loss(y_val, val_pred))
+                oof_predictions[val_idx] = val_pred
+                continue
+
+            # 诊断: 检查 min_child_samples/min_split_gain 与数据规模的关系
+            min_child_samples = self.params.get('min_child_samples', None)
+            min_split_gain = self.params.get('min_split_gain', None) or self.params.get('min_gain_to_split', None)
+            if min_child_samples and min_child_samples > len(X_train) * 0.5:
+                logger.warning(f"Fold {fold_idx+1}: min_child_samples({min_child_samples}) 相对于训练样本 ({len(X_train)}) 太大，可能导致无法分裂")
+            if min_split_gain and min_split_gain > 1.0:
+                logger.warning(f"Fold {fold_idx+1}: min_split_gain({min_split_gain}) 较大，可能导致缺乏正增益分裂")
+
             logger.info(f"训练集: {len(X_train)} 样本, 验证集: {len(X_val)} 样本")
             
             # 创建数据集
             train_data = lgb.Dataset(X_train, label=y_train)
             val_data = lgb.Dataset(X_val, label=y_val, reference=train_data)
             
-            # 训练模型
-            model = lgb.train(
-                self.params,
-                train_data,
-                valid_sets=[train_data, val_data],
-                valid_names=['train', 'valid'],
-                callbacks=[
-                    lgb.early_stopping(stopping_rounds=early_stopping_rounds),
-                    lgb.log_evaluation(period=verbose)
-                ]
-            )
+            # 训练模型 - 如果 verbose<=0 则不输出训练日志（将不会加入 log_evaluation 回调）
+            callbacks = [lgb.early_stopping(stopping_rounds=early_stopping_rounds)]
+            if verbose and verbose > 0:
+                callbacks.append(lgb.log_evaluation(period=verbose))
+
+            # 如果需要抑制 LightGBM 内部 Warning（如 "No further splits with positive gain"），可捕获 stderr
+            if suppress_lgb_warnings:
+                import os
+                try:
+                    # 另外设置 Python logger 对 LightGBM 的 level（Python 侧）
+                    import logging as _logging
+                    _logging.getLogger('lightgbm').setLevel(_logging.ERROR)
+                except Exception:
+                    pass
+
+                # 将操作系统级别的 stderr 重定向到 /dev/null，捕获 C++ 层的输出
+                devnull_fd = os.open(os.devnull, os.O_RDWR)
+                old_stderr_fd = os.dup(2)
+                try:
+                    os.dup2(devnull_fd, 2)
+                    model = lgb.train(
+                        self.params,
+                        train_data,
+                        valid_sets=[train_data, val_data],
+                        valid_names=['train', 'valid'],
+                        callbacks=callbacks,
+                    )
+                finally:
+                    os.dup2(old_stderr_fd, 2)
+                    os.close(old_stderr_fd)
+                    os.close(devnull_fd)
+            else:
+                model = lgb.train(
+                    self.params,
+                    train_data,
+                    valid_sets=[train_data, val_data],
+                    valid_names=['train', 'valid'],
+                    callbacks=callbacks,
+                )
             
             # 保存模型
             self.models.append(model)
             
             # 预测验证集
             val_pred = model.predict(X_val, num_iteration=model.best_iteration)
+            
+            # 确保 val_pred 的形状与 oof_predictions[val_idx] 匹配
+            if len(val_pred.shape) == 1:
+                # 如果 val_pred 是一维数组，将其扩展为二维数组
+                val_pred = np.expand_dims(val_pred, axis=1)
+
+            # 再次检查形状是否匹配
+            if val_pred.shape[1] != oof_predictions.shape[1]:
+                raise ValueError(
+                    f"Shape mismatch: val_pred has shape {val_pred.shape}, but expected {oof_predictions[val_idx].shape}"
+                )
+
             oof_predictions[val_idx] = val_pred
             
             # 计算验证集得分
             fold_score = log_loss(y_val, val_pred)
             cv_scores.append(fold_score)
-            
+
+            # 检查是否是当前最佳得分
+            if fold_score < best_score:
+                best_score = fold_score
+                best_params = self.params.copy()
+                best_fold = fold_idx + 1
+
             logger.info(f"Fold {fold_idx + 1} 最佳迭代: {model.best_iteration}")
             logger.info(f"Fold {fold_idx + 1} 验证得分: {fold_score:.6f}")
         
@@ -127,6 +221,16 @@ class LightGBMTrainer:
         
         # 保存OOF预测
         self.oof_predictions = oof_predictions
+
+        # 在交叉验证结束后记录最佳超参数
+        logger.info("="*60)
+        logger.info(f"最佳超参数出现在 Fold {best_fold}")
+        logger.info(f"最佳超参数: {best_params}")
+        logger.info(f"最佳得分: {best_score:.6f}")
+        logger.info("="*60)
+        # 如果我们之前使用了 warnings.catch_warnings，上下文需要恢复
+        if filter_context is not None:
+            filter_context.__exit__(None, None, None)
         
         return oof_score
     
