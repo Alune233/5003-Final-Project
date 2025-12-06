@@ -1,0 +1,164 @@
+[
+  {
+    "trial": 0,
+    "params": {
+      "C": 0.1,
+      "kernel": "rbf",
+      "gamma": 0.001
+    },
+    "score": 1.762849275201618
+  },
+  {
+    "trial": 1,
+    "params": {
+      "C": 0.1,
+      "kernel": "rbf",
+      "gamma": 0.01
+    },
+    "score": 1.7460234016635774
+  },
+  {
+    "trial": 2,
+    "params": {
+      "C": 0.1,
+      "kernel": "rbf",
+      "gamma": 0.1
+    },
+    "score": 1.9202821108050203
+  },
+  {
+    "trial": 3,
+    "params": {
+      "C": 0.1,
+      "kernel": "linear",
+      "gamma": 0.001
+    },
+    "score": 1.410133227715787
+  },
+  {
+    "trial": 4,
+    "params": {
+      "C": 0.1,
+      "kernel": "linear",
+      "gamma": 0.01
+    },
+    "score": 1.410133227715787
+  },
+  {
+    "trial": 5,
+    "params": {
+      "C": 0.1,
+      "kernel": "linear",
+      "gamma": 0.1
+    },
+    "score": 1.410133227715787
+  },
+  {
+    "trial": 6,
+    "params": {
+      "C": 1.0,
+      "kernel": "rbf",
+      "gamma": 0.001
+    },
+    "score": 1.508165201291172
+  },
+  {
+    "trial": 7,
+    "params": {
+      "C": 1.0,
+      "kernel": "rbf",
+      "gamma": 0.01
+    },
+    "score": 1.5208010144708035
+  },
+  {
+    "trial": 8,
+    "params": {
+      "C": 1.0,
+      "kernel": "rbf",
+      "gamma": 0.1
+    },
+    "score": 1.8730410202651726
+  },
+  {
+    "trial": 9,
+    "params": {
+      "C": 1.0,
+      "kernel": "linear",
+      "gamma": 0.001
+    },
+    "score": 1.426275058803676
+  },
+  {
+    "trial": 10,
+    "params": {
+      "C": 1.0,
+      "kernel": "linear",
+      "gamma": 0.01
+    },
+    "score": 1.426275058803676
+  },
+  {
+    "trial": 11,
+    "params": {
+      "C": 1.0,
+      "kernel": "linear",
+      "gamma": 0.1
+    },
+    "score": 1.426275058803676
+  },
+  {
+    "trial": 12,
+    "params": {
+      "C": 10.0,
+      "kernel": "rbf",
+      "gamma": 0.001
+    },
+    "score": 1.3966164123902503
+  },
+  {
+    "trial": 13,
+    "params": {
+      "C": 10.0,
+      "kernel": "rbf",
+      "gamma": 0.01
+    },
+    "score": 1.4926908990463779
+  },
+  {
+    "trial": 14,
+    "params": {
+      "C": 10.0,
+      "kernel": "rbf",
+      "gamma": 0.1
+    },
+    "score": 1.8634628346713187
+  },
+  {
+    "trial": 15,
+    "params": {
+      "C": 10.0,
+      "kernel": "linear",
+      "gamma": 0.001
+    },
+    "score": 1.4249700892847856
+  },
+  {
+    "trial": 16,
+    "params": {
+      "C": 10.0,
+      "kernel": "linear",
+      "gamma": 0.01
+    },
+    "score": 1.4249700892847856
+  },
+  {
+    "trial": 17,
+    "params": {
+      "C": 10.0,
+      "kernel": "linear",
+      "gamma": 0.1
+    },
+    "score": 1.4249700892847856
+  }
+]

@@ -24,12 +24,13 @@ class GridSearch(BaseHPO):
     遍历所有预定义的参数组合，找到最优解
     """
     
-    def __init__(self, model_name='lightgbm', cv_folds=5, random_state=42):
+    def __init__(self, model_name='lightgbm', n_trials=None, cv_folds=5, random_state=42):
         """
         初始化Grid Search
         
         Args:
             model_name: 模型名称 ('lightgbm', 'svm', 'mlp')
+            n_trials: 搜索次数（Grid Search不需要，自动计算）
             cv_folds: 交叉验证折数（默认5）
             random_state: 随机种子（默认42）
         
@@ -40,11 +41,17 @@ class GridSearch(BaseHPO):
         
         # 定义离散化的搜索网格
         self.param_grid = self._create_param_grid()
+        self.total_grid_size = self._count_grid_size()
         
-        # 计算总试验次数
-        self.n_trials = self._count_grid_size()
+        # 根据用户的n_trials选择是否子采样网格
+        self.param_combinations = self._prepare_param_combinations(n_trials)
         
-        logger.info(f"网格搜索将尝试 {self.n_trials} 种参数组合")
+        if self.total_grid_size == self.n_trials:
+            logger.info(f"网格搜索将尝试全部 {self.n_trials} 种参数组合")
+        else:
+            logger.info(
+                f"网格搜索原有 {self.total_grid_size} 种组合，本次根据n_trials采样 {self.n_trials} 种"
+            )
     
     def _create_param_grid(self):
         """
@@ -107,6 +114,23 @@ class GridSearch(BaseHPO):
         for values in product(*param_values):
             params = dict(zip(param_names, values))
             yield params
+
+    def _prepare_param_combinations(self, requested_trials):
+        """根据n_trials决定实际需要评估的网格点"""
+        all_combinations = list(self._generate_all_combinations())
+        grid_size = len(all_combinations)
+        
+        # 没有限制或限制大于等于网格尺寸 -> 评估全部组合
+        if not requested_trials or requested_trials >= grid_size:
+            self.n_trials = grid_size
+            return all_combinations
+        
+        # 按随机种子采样部分组合，保证可重复
+        rng = np.random.default_rng(self.random_state)
+        selected_indices = rng.choice(grid_size, size=requested_trials, replace=False)
+        selected_indices.sort()
+        self.n_trials = requested_trials
+        return [all_combinations[idx] for idx in selected_indices]
     
     def optimize(self, objective_function, verbose=True):
         """
@@ -129,10 +153,10 @@ class GridSearch(BaseHPO):
         
         # 遍历所有参数组合
         iterator = tqdm(
-            enumerate(self._generate_all_combinations()), 
+            enumerate(self.param_combinations), 
             total=self.n_trials,
             desc="Grid Search进度"
-        ) if verbose else enumerate(self._generate_all_combinations())
+        ) if verbose else enumerate(self.param_combinations)
         
         for trial_idx, params in iterator:
             try:

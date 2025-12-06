@@ -1,0 +1,298 @@
+[
+  {
+    "trial": 0,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.0001,
+      "batch_size": 64
+    },
+    "score": 1.357944412604996
+  },
+  {
+    "trial": 1,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.0001,
+      "batch_size": 128
+    },
+    "score": 1.351496002045749
+  },
+  {
+    "trial": 2,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.001,
+      "batch_size": 64
+    },
+    "score": 1.3688813990883157
+  },
+  {
+    "trial": 3,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.001,
+      "batch_size": 128
+    },
+    "score": 1.384362883322611
+  },
+  {
+    "trial": 4,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.0001,
+      "batch_size": 64
+    },
+    "score": 1.5463552422512243
+  },
+  {
+    "trial": 5,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.0001,
+      "batch_size": 128
+    },
+    "score": 1.554283560762914
+  },
+  {
+    "trial": 6,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.001,
+      "batch_size": 64
+    },
+    "score": 1.5631985443699639
+  },
+  {
+    "trial": 7,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.001,
+      "batch_size": 128
+    },
+    "score": 1.5939524784032084
+  },
+  {
+    "trial": 8,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.0001,
+      "batch_size": 64
+    },
+    "score": 1.4519773324234722
+  },
+  {
+    "trial": 9,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.0001,
+      "batch_size": 128
+    },
+    "score": 1.4282823691470947
+  },
+  {
+    "trial": 10,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.001,
+      "batch_size": 64
+    },
+    "score": 1.4414798431056584
+  },
+  {
+    "trial": 11,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.001,
+      "batch_size": 128
+    },
+    "score": 1.4195203804960363
+  },
+  {
+    "trial": 12,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.0001,
+      "batch_size": 64
+    },
+    "score": 1.6734021289478338
+  },
+  {
+    "trial": 13,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.0001,
+      "batch_size": 128
+    },
+    "score": 1.7045164053945474
+  },
+  {
+    "trial": 14,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.001,
+      "batch_size": 64
+    },
+    "score": 1.6530124716070087
+  },
+  {
+    "trial": 15,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.001,
+      "batch_size": 128
+    },
+    "score": 1.5611240845173204
+  },
+  {
+    "trial": 16,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.0001,
+      "batch_size": 64
+    },
+    "score": 1.6400604980747642
+  },
+  {
+    "trial": 17,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.0001,
+      "batch_size": 128
+    },
+    "score": 1.558372198671182
+  },
+  {
+    "trial": 18,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.001,
+      "batch_size": 64
+    },
+    "score": 1.549169570136861
+  },
+  {
+    "trial": 19,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.001,
+      "batch_size": 128
+    },
+    "score": 1.564096569260023
+  },
+  {
+    "trial": 20,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.0001,
+      "batch_size": 64
+    },
+    "score": 1.6100906144453337
+  },
+  {
+    "trial": 21,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.0001,
+      "batch_size": 128
+    },
+    "score": 1.8124547928320538
+  },
+  {
+    "trial": 22,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.001,
+      "batch_size": 64
+    },
+    "score": 1.6378166375883196
+  },
+  {
+    "trial": 23,
+    "params": {
+      "hidden_layer_sizes": [
+        256,
+        128
+      ],
+      "learning_rate_init": 0.01,
+      "alpha": 0.001,
+      "batch_size": 128
+    },
+    "score": 1.6435407386959904
+  }
+]
