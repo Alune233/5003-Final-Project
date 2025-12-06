@@ -82,7 +82,40 @@ outputs/
 └── {model}_{algo}_submission.csv   # Kaggle提交文件
 ```
 
-## 5️⃣ 调整搜索空间（可选）
+## 5️⃣ 提取前 N 轮结果（比较不同轮次）
+
+如果你跑了 50 轮实验，想比较 10 轮、20 轮、50 轮的效果差异：
+
+```bash
+# 自动从所有历史JSON文件中提取前10轮
+python src/extract_n_trials.py --n_trials 10
+
+# 提取前20轮
+python src/extract_n_trials.py --n_trials 20
+```
+
+**自动处理**：
+
+-   ✅ 自动扫描 `models/` 目录下所有 `*_history.json` 文件
+-   ✅ 提取每个文件的前 N 轮数据
+-   ✅ 生成对应的 JSON、PNG 和 submission 文件
+
+**生成的文件**（以 10 轮为例）：
+
+```
+models/
+├── lightgbm_random_10trials_history.json   # 前10轮历史
+├── lightgbm_random_10trials_history.png    # 前10轮收敛曲线
+└── ...
+
+outputs/
+├── lightgbm_random_10trials_submission.csv # 前10轮最佳结果
+└── ...
+```
+
+**用途**：无需重新跑实验，直接从 50 轮的结果中提取 10 轮、20 轮的数据进行对比分析！
+
+## 6️⃣ 调整搜索空间（可选）
 
 如果需要修改参数范围，编辑 `config/search_spaces.json`：
 
@@ -118,7 +151,7 @@ outputs/
 
 **B 同学注意**：Grid Search 的网格在 `src/hpo/grid_search.py` 的 `_create_param_grid()` 方法中定义。如需调整，编辑该文件第 60-90 行左右的参数网格。
 
-## 6️⃣ D 同学：收集结果
+## 7️⃣ D 同学：收集结果
 
 收集所有队友的 `*_history.json` 文件，然后：
 
@@ -126,7 +159,7 @@ outputs/
 2. 绘制收敛曲线（每个模型一张图，4 条线）
 3. 分析时间 vs 性能
 
-## 7️⃣ 时间安排
+## 8️⃣ 时间安排
 
 -   **12/03 今天**: 全员完成各自的 3 个模型实验
 -   **12/04 明天**: D 同学收集数据，开始分析
@@ -134,7 +167,7 @@ outputs/
 -   **12/06**: 整合报告
 -   **12/07**: 提交
 
-## 8️⃣ 常见问题
+## 9️⃣ 常见问题
 
 ### Q: 遇到错误怎么办？
 

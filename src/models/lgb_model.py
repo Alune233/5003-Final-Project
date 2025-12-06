@@ -27,6 +27,19 @@ class LightGBMModel(BaseModel):
             'num_threads': cpu_threads,
             **params  # 用户参数
         }
+        
+        # 自动检测并启用GPU（如果可用）
+        try:
+            import torch
+            if torch.cuda.is_available():
+                model_params.update({
+                    'device': 'gpu',
+                    'gpu_platform_id': 0,
+                    'gpu_device_id': 0,
+                })
+        except:
+            pass  # 没有GPU或检测失败，使用CPU
+        
         return model_params
     
     def _fit(self, model_params, X_train, y_train, X_val=None, y_val=None):
