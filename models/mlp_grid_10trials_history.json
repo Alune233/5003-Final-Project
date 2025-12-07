@@ -1,0 +1,132 @@
+[
+  {
+    "trial": 0,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.0005,
+      "alpha": 0.001,
+      "batch_size": 128,
+      "activation": "relu"
+    },
+    "score": 1.3274117250834792
+  },
+  {
+    "trial": 1,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.0005,
+      "alpha": 0.001,
+      "batch_size": 128,
+      "activation": "tanh"
+    },
+    "score": 1.3480562975901036
+  },
+  {
+    "trial": 2,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 1e-05,
+      "batch_size": 64,
+      "activation": "tanh"
+    },
+    "score": 1.387913798813292
+  },
+  {
+    "trial": 3,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 1e-05,
+      "batch_size": 96,
+      "activation": "tanh"
+    },
+    "score": 1.3709767035760956
+  },
+  {
+    "trial": 4,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 1e-05,
+      "batch_size": 128,
+      "activation": "tanh"
+    },
+    "score": 1.3660028824344916
+  },
+  {
+    "trial": 5,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.001,
+      "alpha": 0.001,
+      "batch_size": 64,
+      "activation": "relu"
+    },
+    "score": 1.3688813990883157
+  },
+  {
+    "trial": 6,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.005,
+      "alpha": 0.0001,
+      "batch_size": 64,
+      "activation": "tanh"
+    },
+    "score": 1.4835907521938692
+  },
+  {
+    "trial": 7,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.005,
+      "alpha": 0.0001,
+      "batch_size": 96,
+      "activation": "relu"
+    },
+    "score": 1.6283668918972616
+  },
+  {
+    "trial": 8,
+    "params": {
+      "hidden_layer_sizes": [
+        128
+      ],
+      "learning_rate_init": 0.005,
+      "alpha": 0.0001,
+      "batch_size": 128,
+      "activation": "relu"
+    },
+    "score": 1.554225116289514
+  },
+  {
+    "trial": 9,
+    "params": {
+      "hidden_layer_sizes": [
+        256
+      ],
+      "learning_rate_init": 0.0005,
+      "alpha": 1e-05,
+      "batch_size": 96,
+      "activation": "tanh"
+    },
+    "score": 1.3511675950237183
+  }
+]

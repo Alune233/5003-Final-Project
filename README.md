@@ -1,224 +1,241 @@
-# 🚀 超级快速开始指南
+# LLM-Generated Content Detection with HPO Methods Comparison
 
-## 1️⃣ 安装依赖（5 分钟）
+**DSAA 5003 Final Project - AutoML and Hyperparameter Optimization**
 
-```bash
-# 核心依赖（所有人都需要）
-pip install numpy pandas scikit-learn lightgbm torch transformers matplotlib tqdm
+## Abstract
 
-# C同学（TPE）- 需要安装
-pip install optuna
+This project applies Automated Machine Learning (AutoML) techniques, specifically focusing on Hyperparameter Optimization (HPO), to solve the LLM-generated content detection problem. We systematically compare four different HPO methods (Random Search, Grid Search, TPE via Optuna, and SMAC via OpenBox) across three diverse machine learning models (LightGBM, SVM, and MLP). Our experimental framework emphasizes reproducibility, comprehensive analysis, and fair comparison through controlled variables and unified search spaces.
 
-# D同学（SMAC/OpenBox）- 需要安装
-pip install openbox
-# 注意: 在Windows上使用OpenBox，不要安装smac（会失败）
+## Team Structure
+
+| Member               | Role            | Code Responsibilities                                                | Report Sections                    |
+| -------------------- | --------------- | -------------------------------------------------------------------- | ---------------------------------- |
+| **Jiawei He**  | Data & Baseline | Feature extraction (DeBERTa), search space definition, Random Search | Introduction, Data Preprocessing   |
+| **Ling Zhao**  | Grid Search     | Grid Search implementation, model analysis                           | Related Work, Model Description    |
+| **Ran Mei**    | TPE/Optuna      | TPE optimization implementation                                      | HPO Algorithms, Experimental Setup |
+| **Bowen Xiao** | SMAC/OpenBox    | SMAC implementation, result analysis                                 | Experiments & Analysis, Conclusion |
+
+## Project Overview
+
+### Problem Statement
+
+LLM-generated content detection aims to identify which Large Language Model generated a given text based on question-answer pairs. This is a multi-class classification problem with 7 target categories.
+
+### Key Features
+
+- **Controlled Experiment Design**: Unified DeBERTa embeddings and consistent search spaces across all methods
+- **Comprehensive HPO Comparison**: Four different optimization strategies evaluated systematically
+- **Multi-Model Analysis**: Three diverse models representing different algorithm paradigms
+- **Reproducible Pipeline**: Automated workflow with minimal configuration required
+
+## Repository Structure
+
+```
+.
+├── main.py                          # Main entry point for experiments
+├── config/
+│   └── search_spaces.json           # Unified hyperparameter search spaces
+├── src/
+│   ├── models/                      # Model implementations
+│   │   ├── lgb_model.py            # LightGBM (Gradient Boosting)
+│   │   ├── svm_model.py            # Support Vector Machine
+│   │   └── mlp_model.py            # Multi-Layer Perceptron
+│   ├── hpo/                        # HPO algorithm implementations
+│   │   ├── random_search.py        # Random Search (Baseline)
+│   │   ├── grid_search.py          # Grid Search
+│   │   ├── tpe_optuna.py           # TPE via Optuna
+│   │   └── smac_optimizer.py       # SMAC via OpenBox
+│   ├── feature_extraction.py       # DeBERTa feature extraction
+│   ├── preprocess_features.py      # Feature standardization
+│   └── extract_n_trials.py         # Tool for extracting N-trial results
+├── data/
+│   ├── raw/                        # Original Kaggle data
+│   └── processed/                  # Extracted features (.npy)
+├── models/                         # Saved models and optimization history
+├── outputs/                        # Kaggle submission files
+└── README.md                       # This file
 ```
 
-## 2️⃣ A 同学：提取并标准化特征（仅运行一次）
+## Installation
+
+### Prerequisites
+
+- Python 3.8+
+- CUDA-capable GPU (optional, for LightGBM acceleration)
+
+### Dependencies
 
 ```bash
-# 步骤1: 提取DeBERTa特征
-python main.py --mode extract
+# Core dependencies
+pip install numpy pandas scikit-learn lightgbm torch transformers matplotlib tqdm
 
-# 步骤2: 标准化特征（解决SVM/MLP收敛问题）
+# HPO libraries
+pip install optuna      # For TPE (Member C)
+pip install openbox     # For SMAC (Member D)
+```
+
+Or install all at once:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+### Step 1: Feature Extraction (Run Once)
+
+Extract DeBERTa embeddings from raw text data:
+
+```bash
+python main.py --mode extract
+```
+
+This generates feature files in `data/processed/`:
+
+- `train_features.npy` - Training features (768-dim DeBERTa embeddings)
+- `test_features.npy` - Test features
+- `train_labels.npy` - Training labels
+- `test_ids.npy` - Test IDs
+
+### Step 2: Feature Standardization (Run Once)
+
+Standardize features for SVM and MLP convergence:
+
+```bash
 python src/preprocess_features.py
 ```
 
-**生成的文件**: `data/processed/` 目录下的 `.npy` 文件
+This creates standardized features and backs up original files.
 
-**完成后**: 分享所有 `.npy` 文件给全组！
+### Step 3: Run HPO Experiments
 
-## 3️⃣ 运行你的实验（超级简单！）
-
-所有人使用**完全相同**的命令格式：
+**General Command Format:**
 
 ```bash
-python main.py --model [模型] --algo [算法] --n_trials [次数]
+python main.py --model [MODEL] --algo [ALGORITHM] --n_trials [N]
 ```
 
-### A 同学 - Random Search
+**Available Options:**
+
+- Models: `lightgbm`, `svm`, `mlp`
+- Algorithms: `random`, `grid`, `tpe`, `smac`
+- n_trials: Number of trials (default: 50)
+
+**Example Experiments:**
 
 ```bash
+# Random Search (Baseline)
 python main.py --model lightgbm --algo random --n_trials 50
 python main.py --model svm --algo random --n_trials 50
 python main.py --model mlp --algo random --n_trials 50
-```
 
-### B 同学 - Grid Search
-
-```bash
+# Grid Search
 python main.py --model lightgbm --algo grid
 python main.py --model svm --algo grid
 python main.py --model mlp --algo grid
-```
 
-### C 同学 - TPE (Optuna)
-
-```bash
+# TPE (Optuna)
 python main.py --model lightgbm --algo tpe --n_trials 50
 python main.py --model svm --algo tpe --n_trials 50
 python main.py --model mlp --algo tpe --n_trials 50
-```
 
-### D 同学 - SMAC (OpenBox)
-
-```bash
+# SMAC (OpenBox)
 python main.py --model lightgbm --algo smac --n_trials 50
 python main.py --model svm --algo smac --n_trials 50
 python main.py --model mlp --algo smac --n_trials 50
 ```
 
-## 4️⃣ 输出文件
+### Step 4: Extract N-Trial Results (Optional)
 
-运行后会生成：
-
-```
-models/
-├── {model}_{algo}_history.json    # 优化历史（供D同学收集）
-├── {model}_{algo}_history.png     # 收敛曲线
-└── {model}_fold_*.pkl              # 训练好的模型
-
-outputs/
-└── {model}_{algo}_submission.csv   # Kaggle提交文件
-```
-
-## 5️⃣ 提取前 N 轮结果（比较不同轮次）
-
-如果你跑了 50 轮实验，想比较 10 轮、20 轮、50 轮的效果差异：
+To compare performance at different trial counts (10, 20, 50):
 
 ```bash
-# 自动从所有历史JSON文件中提取前10轮
+# Extract first 10 trials from all experiments
 python src/extract_n_trials.py --n_trials 10
 
-# 提取前20轮
+# Extract first 20 trials
 python src/extract_n_trials.py --n_trials 20
 ```
 
-**自动处理**：
+This automatically processes all history files in `models/` and generates:
 
--   ✅ 自动扫描 `models/` 目录下所有 `*_history.json` 文件
--   ✅ 提取每个文件的前 N 轮数据
--   ✅ 生成对应的 JSON、PNG 和 submission 文件
+- `{model}_{algo}_{N}trials_history.json` - Optimization history
+- `{model}_{algo}_{N}trials_history.png` - Convergence plot
+- `{model}_{algo}_{N}trials_submission.csv` - Kaggle submission
 
-**生成的文件**（以 10 轮为例）：
+## Experimental Design
+
+### Controlled Variables
+
+1. **Data**: Unified DeBERTa embeddings (768 dimensions) for all experiments
+2. **Models**: Three models representing different paradigms:
+   - LightGBM: Gradient Boosting Decision Trees
+   - SVM: Kernel-based large-margin classifier
+   - MLP: Neural network with adaptive learning
+3. **Search Space**: Consistent parameter ranges defined in `config/search_spaces.json`
+4. **Evaluation**: 5-fold stratified cross-validation with log-loss metric
+
+### Independent Variable
+
+- **HPO Method**: Random Search, Grid Search, TPE, SMAC
+
+### Evaluation Metrics
+
+- **Primary**: Log-loss (lower is better)
+- **Secondary**: Convergence speed, computational efficiency
+- **Analysis**: Performance vs. trial count, parameter importance
+
+## Output Files
+
+Each experiment generates:
 
 ```
 models/
-├── lightgbm_random_10trials_history.json   # 前10轮历史
-├── lightgbm_random_10trials_history.png    # 前10轮收敛曲线
-└── ...
+├── {model}_{algo}_history.json      # Optimization history for analysis
+├── {model}_{algo}_history.png       # Convergence visualization
+└── {model}_fold_*.pkl               # Trained model weights
 
 outputs/
-├── lightgbm_random_10trials_submission.csv # 前10轮最佳结果
-└── ...
+└── {model}_{algo}_submission.csv    # Kaggle submission file
 ```
 
-**用途**：无需重新跑实验，直接从 50 轮的结果中提取 10 轮、20 轮的数据进行对比分析！
+## Results Summary
 
-## 6️⃣ 调整搜索空间（可选）
+Our experiments systematically compare 4 HPO methods × 3 models = 12 configurations. Key findings include:
 
-如果需要修改参数范围，编辑 `config/search_spaces.json`：
+1. **Method Comparison**: TPE and SMAC demonstrate superior convergence on complex search spaces (MLP)
+2. **Model Performance**: LightGBM achieves best overall performance with proper tuning
+3. **Efficiency Analysis**: Grid Search exhaustive but limited to discrete spaces; Random Search provides strong baseline
 
-```json
-{
-    "lightgbm": {
-        "num_leaves": {
-            "type": "int",
-            "low": 20, // 修改这里的最小值
-            "high": 150, // 修改这里的最大值
-            "log": false
-        },
-        "learning_rate": {
-            "type": "float",
-            "low": 0.01, // 修改这里
-            "high": 0.3, // 修改这里
-            "log": true // true表示对数尺度采样
-        }
-        // ... 其他参数
-    }
-}
-```
+_(Detailed results and analysis are provided in the report)_
 
-**说明**：
+## Reproducibility
 
--   `type: "int"` - 整数参数
--   `type: "float"` - 浮点数参数
--   `type: "categorical"` - 分类参数（从 choices 中选择）
--   `log: true` - 对数尺度采样（适用于学习率等参数）
--   `log: false` - 线性尺度采样
+### Search Space Configuration
 
-修改后直接运行实验即可，无需重启程序。
+Hyperparameter search spaces are defined in `config/search_spaces.json` and shared across all HPO methods (except Grid Search, which uses discretized grids in `src/hpo/grid_search.py`).
 
-**B 同学注意**：Grid Search 的网格在 `src/hpo/grid_search.py` 的 `_create_param_grid()` 方法中定义。如需调整，编辑该文件第 60-90 行左右的参数网格。
+### Random Seeds
 
-## 7️⃣ D 同学：收集结果
+- Fixed random seed: 42
+- Deterministic cross-validation splits
+- Reproducible model training
 
-收集所有队友的 `*_history.json` 文件，然后：
+### Hardware
 
-1. 创建性能对比表（4×3 矩阵）
-2. 绘制收敛曲线（每个模型一张图，4 条线）
-3. 分析时间 vs 性能
+- CPU: Multi-core processors (utilized by all methods)
+- GPU: Optional, auto-detected for LightGBM acceleration
+- Memory: ~8GB RAM recommended
 
-## 8️⃣ 时间安排
+## External Resources & Citations
 
--   **12/03 今天**: 全员完成各自的 3 个模型实验
--   **12/04 明天**: D 同学收集数据，开始分析
--   **12/05**: 完成报告初稿
--   **12/06**: 整合报告
--   **12/07**: 提交
+### Datasets
 
-## 9️⃣ 常见问题
+- **Kaggle Competition**: [LLM Generated Content Detection Challenge]
+- Original dataset provided by competition organizers
 
-### Q: 遇到错误怎么办？
+### Pre-trained Models
 
-```bash
-# 如果提示缺少optuna
-pip install optuna
-
-# 如果提示缺少openbox
-pip install openbox
-
-# 如果遇到其他依赖问题
-pip install -r requirements.txt
-```
-
-### Q: 实验要跑多久？
-
--   LightGBM: 每个 trial 约 1-2 分钟，50 个 trial 约 1-2 小时
--   SVM: 每个 trial 约 2-5 分钟，较慢
--   MLP: 每个 trial 约 3-5 分钟，较慢
-
-### Q: 可以调整试验次数吗？
-
-可以！如果时间不够：
-
-```bash
-# 减少到30次试验
-python main.py --model lightgbm --algo random --n_trials 30
-```
-
-### Q: Grid Search 需要设置 n_trials 吗？
-
-不需要！Grid Search 会自动遍历所有组合：
-
-```bash
-# 直接运行，无需指定n_trials
-python main.py --model lightgbm --algo grid
-```
-
-## 🎉 就这么简单！
-
-**你不需要**：
-
--   ❌ 写任何代码
--   ❌ 了解交叉验证细节
--   ❌ 手动保存结果
--   ❌ 配置复杂参数
-
-**你只需要**：
-
--   ✅ 安装依赖
--   ✅ 运行一行命令（3 个参数）
--   ✅ 等待结果
-
-**超级精简！无脑运行！** 🚀
+- **DeBERTa-v3-base**: Microsoft's DeBERTa model via HuggingFace Transformers
+  - Citation: He, P., et al. (2021). "DeBERTa: Decoding-enhanced BERT with Disentangled Attention"
+    ### Code References
