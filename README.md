@@ -199,16 +199,6 @@ outputs/
 └── {model}_{algo}_submission.csv    # Kaggle submission file
 ```
 
-## Results Summary
-
-Our experiments systematically compare 4 HPO methods × 3 models = 12 configurations. Key findings include:
-
-1. **Method Comparison**: TPE and SMAC demonstrate superior convergence on complex search spaces (MLP)
-2. **Model Performance**: LightGBM achieves best overall performance with proper tuning
-3. **Efficiency Analysis**: Grid Search exhaustive but limited to discrete spaces; Random Search provides strong baseline
-
-_(Detailed results and analysis are provided in the report)_
-
 ## Reproducibility
 
 ### Search Space Configuration
@@ -221,12 +211,6 @@ Hyperparameter search spaces are defined in `config/search_spaces.json` and shar
 - Deterministic cross-validation splits
 - Reproducible model training
 
-### Hardware
-
-- CPU: Multi-core processors (utilized by all methods)
-- GPU: Optional, auto-detected for LightGBM acceleration
-- Memory: ~8GB RAM recommended
-
 ## External Resources & Citations
 
 ### Datasets
@@ -238,4 +222,44 @@ Hyperparameter search spaces are defined in `config/search_spaces.json` and shar
 
 - **DeBERTa-v3-base**: Microsoft's DeBERTa model via HuggingFace Transformers
   - Citation: He, P., et al. (2021). "DeBERTa: Decoding-enhanced BERT with Disentangled Attention"
-    ### Code References
+
+### Code References
+
+- Feature extraction pipeline adapted from HuggingFace examples
+- Model implementations follow scikit-learn and LightGBM official documentation
+
+## Our Contributions
+
+### Novel Aspects
+
+1. **Unified Framework**: Designed a fair comparison framework with consistent search spaces
+2. **Multi-Model Analysis**: Systematic evaluation across three diverse model types
+3. **Automated Pipeline**: One-command execution with minimal configuration
+4. **Extraction Tool**: Novel tool for comparing different trial counts from single experiment
+
+### Team Member Contributions
+
+- **Jiawei He**: Infrastructure setup, feature extraction pipeline, Random Search baseline
+- **Ling Zhao**: Grid Search implementation with discretized spaces, model analysis
+- **Ran Mei**: TPE integration with Optuna, search space design
+- **Bowen Xiao**: SMAC integration with OpenBox, comprehensive result analysis
+
+## Kaggle Submission
+
+### Local Test Results
+
+*(Results provided in "5003 Final Project/models" package)*
+
+### Online Test Results
+
+_(Screenshots provided in submission package)_
+
+## Academic Integrity
+
+This project was completed in accordance with HKUST-GZ's Academic Honor Code. All external resources are properly cited. We used AI tools (ChatGPT/Claude) for:
+
+- Code documentation polishing
+- README structure suggestions
+- English grammar correction
+
+The core implementations, experimental design, and analysis are our original work.
